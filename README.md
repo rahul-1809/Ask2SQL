@@ -97,17 +97,9 @@ Deprecated modules (kept as stubs): `model_utils.py`, `groq_text2sql.py`, `sql_w
 - Table summaries: after uploading files, the UI shows table-level summaries (columns, sample rows, numeric stats).
 - Query explanations: each generated SQL includes a concise, human-readable explanation (Groq) to help users learn and verify results.
 
-## Minimal test
-
-```bash
-python test_workflow_min.py
-```
 
 ## Troubleshooting
 
 - If Flask does not start, ensure no other process is using port 5000 and run `./run.sh`.
 - If the fine-tuned model is missing, the system falls back to the base model (`Salesforce/codet5-small`).
 - Loading LoRA adapters requires `peft` installed in your environment.
-
-## License
-MIT
