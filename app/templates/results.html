@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Query Results</title>
+  <style>
+    :root{ --bg:#071025; --card: rgba(255,255,255,0.02); --accent:#60a5fa; --accent-2:#6ee7b7; --muted:#94a3b8 }
+    body{margin:0; font-family:Inter,system-ui,Arial; background:linear-gradient(180deg,#071025,#071733); color:#e6eef6; padding:20px}
+    .wrap{ max-width:1200px; margin:0 auto; display:flex; gap:18px; align-items:flex-start; flex-direction:column }
+    .card{ background:var(--card); border-radius:12px; padding:18px; box-shadow:0 8px 30px rgba(2,6,23,0.6); width:100%; box-sizing:border-box }
+    a.back{ color:var(--muted); text-decoration:none; display:inline-block; margin-bottom:12px; transition: color 0.2s }
+    a.back:hover{ color:var(--accent) }
+    h1{ margin:0 0 14px 0; font-size:24px; color:#fff }
+    .section{ margin-bottom:18px }
+    .label{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px }
+    .question-text{ font-size:16px; color:#fff; margin-bottom:14px }
+    pre.sql{ background:rgba(255,255,255,0.02); padding:14px; border-radius:8px; font-family:monospace; font-size:13px; overflow:auto; color:#cfe9ff; border:1px solid rgba(255,255,255,0.03) }
+    .explain{ background:linear-gradient(90deg, rgba(96,165,250,0.08), rgba(110,231,183,0.06)); border-left:4px solid var(--accent); padding:14px; border-radius:8px; margin-top:14px; color:#e0f2fe }
+    .explain h4{ margin:0 0 8px 0; font-size:14px; color:var(--accent-2) }
+    table.res{ width:100%; border-collapse:collapse; margin-top:12px; font-size:14px }
+    table.res th{ text-align:left; padding:10px; color:var(--accent-2); font-weight:700; border-bottom:2px solid rgba(110,231,183,0.2); background:rgba(255,255,255,0.02) }
+    table.res td{ padding:10px; border-bottom:1px solid rgba(255,255,255,0.04); color:#cbd5e1 }
+    table.res tr:hover{ background:rgba(255,255,255,0.02) }
+    .no-results{ color:var(--muted); padding:24px; text-align:center; font-style:italic }
+    .info-box{ display:flex; gap:20px; margin-top:14px; padding:12px; background:rgba(255,255,255,0.02); border-radius:8px }
+    .info-item{ display:flex; align-items:center; gap:8px }
+    .info-label{ color:var(--muted); font-size:13px }
+    .info-value{ color:var(--accent); font-weight:700; font-size:16px }
+    .btn{ display:inline-block; padding:10px 16px; border-radius:8px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#042027; text-decoration:none; font-weight:600; transition:transform 0.2s }
+    .btn:hover{ transform:translateY(-2px) }
+
+    @media (max-width:768px){ 
+      .wrap{ padding:12px } 
+      table.res{ font-size:12px }
+      table.res th, table.res td{ padding:8px }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/">← Back to Home</a>
+    
+    <div class="card">
+      <h1>✨ Query Results</h1>
+      
+      <div class="section">
+        <div class="label">Your Question</div>
+        <div class="question-text">{{ question }}</div>
+      </div>
+
+      <div class="section">
+        <div class="label">Generated SQL</div>
+        <pre class="sql">{{ sql }}</pre>
+      </div>
+
+      {% if explanation %}
+      <div class="explain">
+        <h4>💡 Explanation</h4>
+        <div>{{ explanation }}</div>
+      </div>
+      {% endif %}
+
+      <div class="section">
+        <div class="label">Query Results</div>
+        {% if columns and rows %}
+          <table class="res">
+            <thead>
+              <tr>
+                {% for c in columns %}<th>{{ c }}</th>{% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in rows %}
+              <tr>
+                {% for v in r %}
+                <td>{{ v }}</td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="info-box">
+            <div class="info-item">
+              <span class="info-label">Columns:</span>
+              <span class="info-value">{{ columns|length }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Rows:</span>
+              <span class="info-value">{{ rows|length }}</span>
+            </div>
+          </div>
+        {% else %}
+          <div class="no-results">No results returned from this query.</div>
+        {% endif %}
+      </div>
+
+      <div style="margin-top:20px">
+        <a href="/" class="btn">🔍 Make Another Query</a>
+        <a href="/history" class="btn" style="margin-left:10px">📜 View History</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

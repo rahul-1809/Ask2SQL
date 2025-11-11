@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Query History - Text2SQL</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 2rem;
+            max-width: 1400px;
+            margin: 2rem auto;
+            background: #f5f5f5;
+        }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            margin: 1rem 0;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px 16px;
+            text-align: left;
+        }
+        th { 
+            background: #FF9800;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #fff3e0; }
+        pre { 
+            background: #f5f5f5; 
+            padding: 0.5rem; 
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-width: 400px;
+            overflow-x: auto;
+        }
+        h1 { color: #333; border-bottom: 3px solid #FF9800; padding-bottom: 0.5rem; }
+        .back-btn {
+            display: inline-block;
+            background: #2196F3;
+            color: white;
+            padding: 0.7rem 2rem;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 2rem;
+            transition: background 0.3s;
+        }
+        .back-btn:hover { background: #1976D2; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+            font-size: 1.1rem;
+        }
+        .row-count {
+            background: #e3f2fd;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📜 Query History</h1>
+        
+        {% if history|length == 0 %}
+        <div class="empty-state">
+            <p>🔍 No queries yet!</p>
+            <p style="font-size: 0.9rem; color: #666;">Run some queries to see them here.</p>
+        </div>
+        {% else %}
+        <p style="color: #666; margin-bottom: 1rem;">Total queries: <strong>{{ history|length }}</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th style="width: 25%;">Question</th>
+                    <th style="width: 40%;">SQL</th>
+                    <th style="width: 25%;">Explanation</th>
+                    <th style="width: 120px;">Rows</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in history %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ item.question }}</td>
+                    <td><pre>{{ item.sql }}</pre></td>
+                    <td style="font-size: 0.8rem; color: #555;">
+                        {% if item.explanation %}
+                        {{ item.explanation[:150] }}{% if item.explanation|length > 150 %}...{% endif %}
+                        {% else %}
+                        <span style="color: #999;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="row-count">{{ item.rows|length }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        
+        <a href="/" class="back-btn">⬅️ Back to Home</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+## Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables
+.env
+.env.local
+
+# Application DBs and uploads
+uploaded_data.db
+app/uploaded_data.db
+app/uploads/
+uploads/
+
+# Models and checkpoints (large files)
+models/fine_tuned_text2sql_codet5/
+models/**/checkpoint-*/
+checkpoints/
+*.bin
+*.safetensors
+*.pt
+*.ckpt
+
+# Hugging Face cache
+.cache/huggingface/
+
+# Python tooling caches
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary docs and generated notes
+TERMINAL_LOGGING.md
+FIXES_APPLIED.md
+MULTIPLE_TABLES_GUIDE.md
+CLEANUP_NOTES.md
+
+# Test artifacts
+test_*.py
+test_upload_*.py
+
+# Deprecated or legacy files (may already be removed)
+LANGGRAPH_WORKFLOW.md
+SIMPLIFIED_ARCHITECTURE.md
+VISUAL_COMPARISON.py
+END_TO_END_WORKFLOW.py
+QUICK_REFERENCE.md
+IMPLEMENTATION_SUMMARY.md
+WORKFLOW_SUMMARY.md

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Query Results - Text2SQL</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 2rem; 
+            max-width: 1400px; 
+            margin: 2rem auto;
+            background: #f5f5f5;
+        }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { 
+            border-collapse: collapse; 
+            width: 100%; 
+            margin: 1rem 0;
+            background: white;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px 16px;
+            text-align: left;
+        }
+        th { 
+            background: #2196F3; 
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #e3f2fd; }
+        pre { 
+            background: #f5f5f5; 
+            padding: 1rem; 
+            border-radius: 4px;
+            border-left: 4px solid #2196F3;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+        .question-box {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 4px;
+            border-left: 4px solid #2196F3;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+        .warning {
+            color: #ff6f00;
+            font-weight: bold;
+            margin: 1em 0;
+            padding: 1rem;
+            background: #fff3e0;
+            border-left: 4px solid #ff6f00;
+            border-radius: 4px;
+        }
+        .correction {
+            color: #2e7d32;
+            margin: 1em 0;
+            padding: 1rem;
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            border-radius: 4px;
+        }
+        .summary {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-weight: bold;
+            color: #555;
+        }
+        h1 { color: #333; border-bottom: 3px solid #2196F3; padding-bottom: 0.5rem; }
+        h3 { color: #555; margin-top: 2rem; }
+        .back-btn {
+            display: inline-block;
+            background: #2196F3;
+            color: white;
+            padding: 0.7rem 2rem;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 2rem;
+            transition: background 0.3s;
+        }
+        .back-btn:hover { background: #1976D2; }
+        .table-wrapper {
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .explanation-box {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+        }
+        .explanation-box h3 {
+            margin-top: 0;
+            color: #f57c00;
+        }
+        .explanation-content {
+            color: #555;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Query Results</h1>
+        
+        <h3>❓ Question</h3>
+        <div class="question-box">{{ question }}</div>
+        
+        <h3>🔍 Generated SQL</h3>
+        <pre>{{ sql }}</pre>
+        
+        {% if explanation %}
+        <div class="explanation-box">
+            <h3>💡 Query Explanation</h3>
+            <div class="explanation-content">{{ explanation }}</div>
+        </div>
+        {% endif %}
+        
+        {% if warning %}
+        <div class="warning">⚠️ {{ warning }}</div>
+        {% endif %}
+        
+        {% if suggested_sql %}
+        <div class="correction">
+            <strong>✨ Suggested Correction:</strong>
+            <pre style="background: white; border: none; margin-top: 0.5rem;">{{ suggested_sql }}</pre>
+        </div>
+        {% endif %}
+        
+        {% if summary %}
+        <div class="summary">📈 {{ summary }}</div>
+        {% endif %}
+        
+        {% if viz %}
+        <h3>📊 Proposed Visualization</h3>
+        <pre>{{ viz|tojson }}</pre>
+        {% endif %}
+        
+        <h3>📋 Results ({{ rows|length }} row{{ 's' if rows|length != 1 else '' }})</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        {% for c in columns %}<th>{{ c }}</th>{% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if rows|length == 0 %}
+                    <tr>
+                        <td colspan="{{ columns|length }}" style="text-align: center; color: #999; padding: 2rem;">
+                            No results found
+                        </td>
+                    </tr>
+                    {% else %}
+                    {% for r in rows %}
+                    <tr>
+                        {% for i in range(columns|length) %}
+                        <td>{{ r[i] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        
+        <a href="/" class="back-btn">⬅️ Back to Home</a>
+        <a href="/history" class="back-btn" style="background: #FF9800; margin-left: 1rem;">📜 View History</a>
+    </div>
+</body>
+</html>

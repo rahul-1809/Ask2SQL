@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Text-to-SQL Chatbot</title>
+    <style>
+        :root{
+            --bg:#0f1724; /* deep navy */
+            --card:#0b1220; /* card background */
+            --accent:#6ee7b7; /* mint */
+            --accent-2:#60a5fa; /* blue */
+            --muted:#94a3b8;
+            --glass: rgba(255,255,255,0.03);
+            --radius:12px;
+            --max-width:1200px;
+            color-scheme: dark;
+        }
+
+        html,body{height:100%;}
+        body{
+            margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg,#071025 0%, #071733 60%);
+            color:#cbd5e1; -webkit-font-smoothing:antialiased; padding:24px; display:flex; justify-content:center;
+        }
+
+        .app{
+            width:100%; max-width:var(--max-width);
+            display:grid; grid-template-columns: 420px 1fr; gap:20px;
+        }
+
+        header.topbar{ grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:6px }
+        .brand{ display:flex; gap:12px; align-items:center; }
+        .logo{ width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:flex; align-items:center; justify-content:center; font-weight:700; color:#042027 }
+        h1.app-title{ font-size:18px; margin:0; color:#e6eef6 }
+        p.app-sub{ margin:0; color:var(--muted); font-size:13px }
+
+        /* left column */
+        .panel{ background:rgba(255,255,255,0.02); border-radius:var(--radius); padding:16px; box-shadow:0 6px 18px rgba(2,6,23,0.6); }
+        .upload-box{ border:1px dashed rgba(255,255,255,0.04); padding:14px; border-radius:10px; background:var(--glass) }
+        .actions{ display:flex; gap:8px; margin-top:12px }
+        .btn{ cursor:pointer; border:0; padding:10px 14px; border-radius:10px; font-weight:600 }
+        .btn.primary{ background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#042027 }
+        .btn.ghost{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.04); text-decoration:none; transition:all 0.2s }
+        .btn.ghost:hover{ background:rgba(255,255,255,0.04); color:var(--accent-2) }
+        .btn.danger{ background:#ef4444 }
+
+        .file-list{ margin-top:10px; display:flex; flex-direction:column; gap:8px }
+        .file-item{ background:rgba(255,255,255,0.02); padding:8px 10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; font-size:13px }
+
+        .tables{ margin-top:14px; display:flex; flex-direction:column; gap:12px }
+        .table-card{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px; border-radius:10px; display:flex; flex-direction:column; gap:8px }
+        .table-meta{ display:flex; gap:12px; align-items:center; color:var(--muted); font-size:13px }
+        .columns{ display:flex; gap:6px; flex-wrap:wrap }
+        .col-pill{ background:rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; font-family:monospace; font-size:12px }
+        .stats-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; font-size:12px }
+        .stat-box{ background:rgba(255,255,255,0.02); padding:8px; border-radius:6px; border-left:2px solid var(--accent) }
+        .stat-label{ color:var(--muted); font-size:11px; margin-bottom:2px }
+        .stat-value{ color:var(--accent-2); font-weight:600 }
+        .sample-preview{ margin-top:8px; padding:8px; background:rgba(255,255,255,0.02); border-radius:6px; font-size:11px }
+        .sample-row{ display:flex; gap:6px; margin:4px 0; color:var(--muted) }
+        .sample-key{ color:var(--accent-2); font-weight:600; min-width:80px }
+
+
+        /* right column */
+        main{ display:flex; flex-direction:column; gap:14px }
+        .card{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:18px; border-radius:12px }
+        .schema-box{ font-family:monospace; font-size:13px; background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; color:var(--muted); max-height:240px; overflow:auto; white-space:pre-wrap; word-break:break-word }
+        .query-input{ width:100%; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:inherit }
+        .query-row{ display:flex; gap:10px; align-items:center }
+        .query-btn{ padding:11px 16px; border-radius:10px; background:linear-gradient(90deg,var(--accent-2),var(--accent)); color:#042027; border:0; font-weight:700 }
+
+        .examples{ color:var(--muted); font-size:13px }
+
+        footer{ grid-column:1/-1; color:var(--muted); font-size:13px; text-align:center; margin-top:8px }
+
+        @media (max-width:980px){ .app{ grid-template-columns: 1fr; } header.topbar{flex-direction:column; align-items:flex-start} }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="topbar">
+            <div class="brand">
+                <div class="logo">T2S</div>
+                <div>
+                    <h1 class="app-title">Text-to-SQL Chatbot</h1>
+                    <p class="app-sub">Upload tables and ask questions in plain English — smart, safe SQL generation</p>
+                </div>
+            </div>
+            <div>
+                <a href="/history" class="btn ghost">📜 History</a>
+            </div>
+        </header>
+
+        <!-- Left column: uploads + tables -->
+        <aside class="panel">
+            {% if message %}
+            <div style="margin-bottom:14px; padding:14px; border-radius:10px; background:rgba(110,231,183,0.08); color:#c5f7df; border:1px solid rgba(110,231,183,0.15); line-height:1.8; font-size:14px">
+                {{ message|safe }}
+            </div>
+            {% endif %}
+
+            <div class="upload-box">
+                <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <div style="display:flex; gap:10px; align-items:center">
+                        <label class="btn ghost" for="fileInput">📁 Choose Files</label>
+                        <input id="fileInput" name="files" type="file" multiple accept=".xlsx,.xls,.csv" style="display:none">
+                        <button type="submit" id="uploadBtn" class="btn primary" disabled>Upload</button>
+                        {% if schema %}
+                        <button formaction="/clear" formmethod="post" class="btn danger" onclick="return confirm('Clear all tables?')">Clear</button>
+                        {% endif %}
+                    </div>
+                    <div class="file-list" id="fileList"></div>
+                </form>
+            </div>
+
+            <div class="tables">
+                {% if table_summaries %}
+                    {% for s in table_summaries %}
+                    <div class="table-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center">
+                            <div style="font-weight:700">{{ s.table_name }}</div>
+                            <div class="table-meta"><div>{{ s.row_count }} rows</div><div>·</div><div>{{ s.column_count }} cols</div></div>
+                        </div>
+                        <div class="columns">
+                            {% for col in s.columns %}
+                            <div class="col-pill">{{ col.name }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if s.stats %}
+                        <div class="stats-grid">
+                            {% for col_name, stat in s.stats.items() %}
+                            <div class="stat-box">
+                                <div class="stat-label">{{ col_name }}</div>
+                                <div class="stat-value">{{ stat.min }} - {{ stat.max }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if s.sample_rows and s.sample_rows|length > 0 %}
+                        <div class="sample-preview">
+                            <div style="color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px">Sample Data (first row)</div>
+                            {% for col_name in s.column_names[:3] %}
+                            <div class="sample-row">
+                                <span class="sample-key">{{ col_name }}:</span>
+                                <span>{{ s.sample_rows[0][loop.index0] }}</span>
+                            </div>
+                            {% endfor %}
+                            {% if s.column_names|length > 3 %}
+                            <div style="color:#64748b; font-style:italic; margin-top:4px">+ {{ s.column_names|length - 3 }} more columns</div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="no-tables">No tables yet — upload CSV/Excel files to begin</div>
+                {% endif %}
+            </div>
+        </aside>
+
+        <!-- Right column: schema, query -->
+        <main>
+            <section class="card">
+                <h2 style="margin:0 0 10px 0">📝 Raw Schema</h2>
+                {% if schema %}
+                <pre class="schema-box">{{ schema }}</pre>
+                {% else %}
+                <div class="schema-box">No schema loaded yet.</div>
+                {% endif %}
+            </section>
+
+            <section class="card">
+                <h2 style="margin:0 0 10px 0">💬 Ask a Question</h2>
+                <form action="/query" method="post">
+                    <div class="query-row">
+                        <input type="text" name="question" class="query-input" placeholder="e.g., Show total sales by product category" />
+                        <button type="submit" class="query-btn">Run</button>
+                    </div>
+                </form>
+                <p class="examples">Examples: "Show all customers from New York" · "Average order value per customer"</p>
+            </section>
+        </main>
+
+        <footer>© Text-to-SQL · Responsive UI • Minimal • Fast</footer>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const uploadBtn = document.getElementById('uploadBtn');
+        fileInput?.addEventListener('change', (e)=>{
+            const files = Array.from(e.target.files||[]);
+            fileList.innerHTML = '';
+            if(files.length===0){ uploadBtn.disabled=true; return }
+            uploadBtn.disabled=false;
+            files.forEach(f=>{
+                const el = document.createElement('div'); el.className='file-item'; el.textContent = f.name + ' ('+Math.round(f.size/1024)+' KB)'; fileList.appendChild(el);
+            })
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Error</title>
+  <style>
+    :root{ --bg:#071025; --card: rgba(255,255,255,0.02); --accent:#ef4444; --accent-2:#fb923c; --muted:#94a3b8 }
+    body{margin:0; font-family:Inter,system-ui,Arial; background:linear-gradient(180deg,#071025,#071733); color:#e6eef6; padding:20px; min-height:100vh; display:flex; align-items:center; justify-content:center}
+    .wrap{ max-width:700px; width:100% }
+    .card{ background:var(--card); border-radius:12px; padding:24px; box-shadow:0 8px 30px rgba(2,6,23,0.6); border:1px solid rgba(239,68,68,0.1) }
+    .icon{ font-size:48px; text-align:center; margin-bottom:16px }
+    h1{ margin:0 0 12px 0; font-size:24px; color:#fff; text-align:center }
+    .error-box{ background:rgba(239,68,68,0.08); border-left:4px solid var(--accent); padding:16px; border-radius:8px; margin:16px 0; color:#fecaca }
+    .error-label{ font-size:12px; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); margin-bottom:8px }
+    .error-text{ font-family:monospace; font-size:14px; line-height:1.6 }
+    .suggestion{ background:rgba(251,146,60,0.08); border-left:4px solid var(--accent-2); padding:14px; border-radius:8px; margin-top:14px; color:#fed7aa }
+    .suggestion h3{ margin:0 0 8px 0; font-size:14px; color:var(--accent-2) }
+    .btn{ display:inline-block; padding:12px 20px; border-radius:8px; background:linear-gradient(90deg,#60a5fa,#6ee7b7); color:#042027; text-decoration:none; font-weight:600; margin-top:20px; text-align:center; transition:transform 0.2s }
+    .btn:hover{ transform:translateY(-2px) }
+    a.back{ color:var(--muted); text-decoration:none; display:block; text-align:center; margin-top:16px; font-size:14px; transition:color 0.2s }
+    a.back:hover{ color:#60a5fa }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="icon">⚠️</div>
+      <h1>Oops! Something Went Wrong</h1>
+      
+      <div class="error-box">
+        <div class="error-label">Error Details</div>
+        <div class="error-text">{{ error }}</div>
+      </div>
+
+      {% if suggestion %}
+      <div class="suggestion">
+        <h3>💡 Suggested Fix</h3>
+        <div>{{ suggestion }}</div>
+      </div>
+      {% endif %}
+
+      <div style="text-align:center">
+        <a href="/" class="btn">🏠 Go Back Home</a>
+      </div>
+      
+      <a class="back" href="/history">View Query History</a>
+    </div>
+  </div>
+</body>
+</html>

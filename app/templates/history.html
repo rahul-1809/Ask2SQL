@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Query History</title>
+  <style>
+    :root{ --bg:#071025; --card: rgba(255,255,255,0.02); --accent:#60a5fa; --accent-2:#6ee7b7; --muted:#94a3b8 }
+    body{margin:0; font-family:Inter,system-ui,Arial; background:linear-gradient(180deg,#071025,#071733); color:#e6eef6; padding:20px}
+    .wrap{ max-width:1400px; margin:0 auto }
+    .card{ background:var(--card); border-radius:12px; padding:20px; box-shadow:0 8px 30px rgba(2,6,23,0.6) }
+    a.back{ color:var(--muted); text-decoration:none; display:inline-block; margin-bottom:14px; transition:color 0.2s }
+    a.back:hover{ color:var(--accent) }
+    h1{ margin:0 0 14px 0; font-size:24px; color:#fff }
+    table{ width:100%; border-collapse:collapse; margin-top:16px; font-size:13px }
+    th{ text-align:left; padding:12px 10px; color:var(--accent-2); font-weight:700; border-bottom:2px solid rgba(110,231,183,0.2); background:rgba(255,255,255,0.02) }
+    td{ padding:12px 10px; border-bottom:1px solid rgba(255,255,255,0.04); color:#cbd5e1; vertical-align:top }
+    tr:hover{ background:rgba(255,255,255,0.02) }
+    .sql-col{ font-family:monospace; color:#a5d8ff; font-size:12px; max-width:400px; white-space:pre-wrap; word-break:break-word }
+    .question-col{ max-width:300px }
+    .explanation-col{ color:var(--muted); font-size:12px; max-width:350px }
+    .timestamp{ color:var(--muted); font-size:11px }
+    .empty{ text-align:center; padding:40px; color:var(--muted); font-style:italic }
+
+    @media (max-width:1024px){ 
+      table{ font-size:12px }
+      th,td{ padding:10px 8px }
+      .sql-col,.question-col,.explanation-col{ max-width:200px }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/">← Back to Home</a>
+    
+    <div class="card">
+      <h1>� Query History</h1>
+      
+      {% if history %}
+        <table>
+          <thead>
+            <tr>
+              <th style="width:25%">Question</th>
+              <th style="width:30%">Generated SQL</th>
+              <th style="width:10%">Status</th>
+              <th style="width:20%">Explanation</th>
+              <th style="width:15%">Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in history %}
+            <tr>
+              <td class="question-col">{{ item.question }}</td>
+              <td class="sql-col">{{ item.sql }}</td>
+              <td>
+                {% if item.error %}
+                  <span style="color:#f87171">❌ Error</span>
+                {% else %}
+                  <span style="color:var(--accent-2)">✅ Success</span>
+                {% endif %}
+              </td>
+              <td class="explanation-col">
+                {% if item.explanation %}
+                  {{ item.explanation[:100] }}{% if item.explanation|length > 100 %}...{% endif %}
+                {% else %}
+                  <span style="color:#64748b">—</span>
+                {% endif %}
+              </td>
+              <td class="timestamp">{{ item.timestamp }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty">No queries in history yet. Start asking questions!</div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
